@@ -18,8 +18,14 @@ def upload_file():
     filepath = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(filepath)
 
-    output_path = generate_visual_from_audio(filepath)
+    blur = float(request.form.get("blur", 0.5))
+    speed = int(request.form.get("speed", 200))
+    pixel_limit = int(request.form.get("pixel_limit", 0))
+
+    output_path = generate_visual_from_audio(filepath, blur=blur, speed=speed, pixel_limit=pixel_limit)
+
     return send_file(output_path, mimetype='image/gif')
 
 if __name__ == '__main__':
     app.run(debug=True)
+

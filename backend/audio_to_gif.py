@@ -12,7 +12,7 @@ import colorsys #rainbow color
 blur_radius = .5
 
 
-def generate_visual_from_audio(file):
+def generate_visual_from_audio(file, blur, speed, pixel_limit):
     with wave.open(file, "rb") as wav_file:
         os.makedirs('frames', exist_ok=True)
         n_channels = wav_file.getnchannels()
@@ -43,6 +43,11 @@ def generate_visual_from_audio(file):
             binary_samples = [format(sample & 0xFFFF, '016b') for sample in mono_samples]
 
             #CREATE COLORS FROM BINARY
+
+            # Optional: Reduce number of samples for performance
+            if pixel_limit > 0 and len(mono_samples) > pixel_limit:
+                step = len(mono_samples) // pixel_limit
+                mono_samples = mono_samples[::step]
 
             colors = []
             #HSV
@@ -76,7 +81,7 @@ def generate_visual_from_audio(file):
                 y = i // side
                 img.putpixel((x, y), color)
 
-            blurred = img.filter(ImageFilter.GaussianBlur(radius=blur_radius)) 
+            blurred = img.filter(ImageFilter.GaussianBlur(radius=blur)) 
             blurred.save(f'frames/audio_colors_{second:04d}.png')
 
         frames = []
@@ -94,7 +99,7 @@ def generate_visual_from_audio(file):
         frames.append(Image.open(f"frames/audio_colors_{total_seconds-1:04d}.png"))
 
         # Save as GIF 
-        frames[0].save("transitions.gif", save_all=True, append_images=frames[1:], duration=200, loop=0)
+        frames[0].save("transitions.gif", save_all=True, append_images=frames[1:], duration=speed, loop=0)
 
     print("GIF created at", os.path.abspath("transitions.gif"))
     return "transitions.gif"
