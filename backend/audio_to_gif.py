@@ -45,16 +45,7 @@ def generate_visual_from_audio(file):
             #CREATE COLORS FROM BINARY
 
             colors = []
-            #RGB
-            # for i in range(0, len(binary_samples) - 1, 2):
-            #     b1 = binary_samples[i]
-            #     b2 = binary_samples[i + 1]
-            #     r = int(b1[:8], 2)
-            #     g = int(b1[8:], 2)
-            #     b = int(b2[:8], 2)
-            #     colors.append((r, g, b))
-
-            # #HSV
+            #HSV
             for val in binary_samples:
                 val_int = int(val, 2)
                 h = val_int / 255  # hue from 0 to 1
@@ -102,10 +93,10 @@ def generate_visual_from_audio(file):
         # Add last frame
         frames.append(Image.open(f"frames/audio_colors_{total_seconds-1:04d}.png"))
 
-        # Save as GIF or use moviepy to make a video
+        # Save as GIF 
         frames[0].save("transitions.gif", save_all=True, append_images=frames[1:], duration=200, loop=0)
 
-
+    print("GIF created at", os.path.abspath("transitions.gif"))
     return "transitions.gif"
 
 
