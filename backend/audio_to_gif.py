@@ -12,7 +12,7 @@ import colorsys #rainbow color
 blur_radius = .5
 
 
-def generate_visual_from_audio(file, blur, speed, pixel_limit):
+def generate_visual_from_audio(file, blur, speed, pixel_limit, tint):
     with wave.open(file, "rb") as wav_file:
         os.makedirs('frames', exist_ok=True)
         n_channels = wav_file.getnchannels()
@@ -50,14 +50,28 @@ def generate_visual_from_audio(file, blur, speed, pixel_limit):
                 mono_samples = mono_samples[::step]
 
             colors = []
+
+            def blend_colors(color1, color2, blend_factor=0.3):
+                return tuple(
+                    int(c1 * (1 - blend_factor) + c2 * blend_factor)
+                    for c1, c2 in zip(color1, color2)
+                )
+
             #HSV
             for val in binary_samples:
                 val_int = int(val, 2)
-                h = val_int / 255  # hue from 0 to 1
+                h = val_int / 255
                 s = 1.0
                 v = 1.0
                 r, g, b = colorsys.hsv_to_rgb(h, s, v)
-                colors.append((int(r * 255), int(g * 255), int(b * 255)))
+                rgb = (int(r * 255), int(g * 255), int(b * 255))
+
+                if tint:
+                    rgb = blend_colors(rgb, tint, blend_factor=0.3)
+
+                colors.append(rgb)
+
+            
 
 
             #CALCULATE IMAGE SQUARE
